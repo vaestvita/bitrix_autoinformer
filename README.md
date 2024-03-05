@@ -1,11 +1,29 @@
 # autoinformer
 
-Автоматический обзвон с напоминанием даты и возможностью подтвердить, отменить запись
+Автоматический обзвон клиентов клиники с напоминанием даты и возможностью подтвердить, отменить запись
 
 
-робот в битриксе (исходящий вебхук)
+робот в битрикс24 (исходящий вебхук)
 ```
-http://89.107.99.121:8001?phone={{Контакт: Мобильный телефон}}&deal_date={{Дата и время записи}}&deal_id={{ID}}
+http://server-ip/call.php?phone={{Контакт: Мобильный телефон}}&deal_date={{Дата и время записи}}&deal_id={{ID}}
 ```
 
-на http://89.107.99.121:8001 запускается скрипт autodialer.py, который создает call файл и копирует его в папку /var/spool/asterisk/outgoing/ 
+
+пример маршрутизации для IVR 
+
+```
+[customdests]
+include => customdests-custom
+exten => dest-2,1,Noop(Entering Custom Destination decline deal)
+exten => dest-2,n,Gosub(deal_action,decline,1())
+exten => dest-2,n,Noop(Returned from Custom Destination decline deal)
+exten => dest-2,n,Goto(play-system-recording,5,1)
+
+exten => dest-3,1,Noop(Entering Custom Destination confirm deal)
+exten => dest-3,n,Gosub(deal_action,confirm,1())
+exten => dest-3,n,Noop(Returned from Custom Destination confirm deal)
+exten => dest-3,n,Goto(play-system-recording,5,1)
+
+;--== end of [customdests] ==--;
+
+```
